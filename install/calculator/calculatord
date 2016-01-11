@@ -1,0 +1,42 @@
+#!/bin/bash
+#add for chkconfig
+#chkconfig: 345 70 30
+#description: for monitor pandora-client_v2
+#processname: pandora-client_v2
+#Author: qinguoan@wandoujia.com
+
+
+BINPATH="/home/op/calculator"
+
+function help
+{
+    echo "$0" "[start|stop|forcestop]"
+}
+function start
+{
+    nohup ${BINPATH}/bin/calculator -c ${BINPATH}/conf/calculator.yaml &> ${BINPATH}/log/calculator.log &
+    PID=$!
+    echo "$PID" > ${BINPATH}/run/calculator.pid
+    echo $PID "started!"
+}
+function stop
+{
+    cat ${BINPATH}/run/calculator.pid | xargs kill
+    echo `cat ${BINPATH}/run/calculator.pid` "stoped"
+    rm ${BINPATH}/run/calculator.pid
+}
+function forcestop
+{
+    ps aux | grep calculator | grep -v grep | awk '{print $2}' | xargs kill -9
+}
+
+#export GOMAXPROCS=12
+
+#export GODEBUG="gctrace=1"
+if [ "$1" == "start" ];then
+        start
+elif [ "$1" == "stop" ];then
+        stop
+else
+        help
+fi

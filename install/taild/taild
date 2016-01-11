@@ -1,0 +1,39 @@
+#!/bin/bash
+#add for chkconfig
+#chkconfig: 345 70 30
+#description: for monitor pandora-client_v2
+#processname: pandora-client_v2
+#Author: qinguoan@wandoujia.com
+
+function help
+{
+    echo "$0" "[start|stop|forcestop]"
+}
+function start
+{
+    nohup /home/op/taild/tail.linux "nats://sa-broker0-ct0.db01:4242,nats://sa-broker0-ct1.db01:4242,nats://sa-broker0-ct2.db01:4242,nats://sa-broker0-cnc0.hlg01:4242,nats://sa-broker0-cnc1.hlg01:4242,nats://sa-broker0-cnc2.hlg01:4242" /home/work/nginx/logs/ 1>/home/op/taild/tail.log 2>/home/op/taild/gc.log &
+    PID=$!
+    echo "$PID" > /home/op/taild/taild.pid
+    echo $PID "started!"
+}
+function stop
+{
+    cat /home/op/taild/taild.pid| xargs kill
+    echo `cat /tmp/taild.pid` "stoped"
+    rm /home/op/taild/taild.pid
+}
+function forcestop
+{
+    ps aux | grep tail.linux | grep -v grep | awk '{print $2}' | xargs kill -9
+}
+
+export GOMAXPROCS=12
+
+export GODEBUG="gctrace=1"
+if [ "$1" == "start" ];then
+        start
+elif [ "$1" == "stop" ];then
+        stop
+else
+        help
+fi

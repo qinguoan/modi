@@ -1,0 +1,15 @@
+language: go
+
+install:
+  - A=${PWD#*github.com/};A=${A%/ffjson};cd ../..;mv $A pquerna;cd pquerna/ffjson
+  - go get -d -v ./...
+  - go get -u github.com/stretchr/testify/require
+  - go get -u github.com/google/gofuzz
+
+script: make clean && make test && make test
+
+go:
+  - 1.2
+  - 1.3
+  - 1.4
+  - tip
